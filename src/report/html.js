@@ -21,6 +21,12 @@ function pct(value, digits = 1) {
   return `${value > 0 ? '+' : ''}${value.toFixed(digits)}%`;
 }
 
+/** A rate, not a change - no plus sign. */
+function rate(value, digits = 1) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
+  return `${value.toFixed(digits)}%`;
+}
+
 function tone(value) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 'mid';
   return value > 0 ? 'good' : value < 0 ? 'bad' : 'mid';
@@ -102,7 +108,7 @@ export function renderHtml(card, backtest = null) {
       const chips = labels.length
         ? labels.map((label) => `<span class="pill">${escapeHtml(label)}</span>`).join(' ')
         : '<span class="dim">no labels returned</span>';
-      return `<li><code>${escapeHtml(wallet.address)}</code> <span class="dim">${escapeHtml(wallet.chain ?? '')}</span> ${chips}</li>`;
+      return `<li><code>${escapeHtml(wallet.address)}</code> <span class="dim">&middot; ${escapeHtml(wallet.chain ?? '')} &middot;</span> ${chips}</li>`;
     })
     .join('\n');
 
@@ -126,7 +132,7 @@ export function renderHtml(card, backtest = null) {
       <h2>Paper backtest <span class="tag">simulation only</span></h2>
       <div class="stats">
         ${stat('P&L', pct(backtest.returnPct), tone(backtest.returnPct))}
-        ${stat('Win rate', pct(backtest.winRatePct), 'mid')}
+        ${stat('Win rate', rate(backtest.winRatePct), 'mid')}
         ${stat('Trades', String(backtest.tradeCount), 'mid')}
         ${stat('Max drawdown', pct(backtest.maxDrawdownPct), 'bad')}
       </div>
@@ -169,7 +175,7 @@ header { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; justi
 .brand { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
 h1 { font-size: clamp(30px, 6vw, 46px); margin: 6px 0 2px; letter-spacing: -.02em; }
 h2 { font-size: 15px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin: 0 0 14px; }
-.grade { font-size: clamp(56px, 14vw, 104px); line-height: .85; font-weight: 700; letter-spacing: -.05em; }
+.grade { font-size: clamp(56px, 14vw, 104px); line-height: .9; font-weight: 700; letter-spacing: -.02em; padding-right: 4px; flex: 0 0 auto; }
 .grade.good { color: var(--good); } .grade.bad { color: var(--bad); } .grade.mid { color: var(--accent); }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; margin-bottom: 18px; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
@@ -213,7 +219,7 @@ a { color: var(--accent); }
 
   <section class="panel">
     <div class="stats">
-      ${stat('Hit rate', pct(card.hitRatePct), 'mid')}
+      ${stat('Hit rate', rate(card.hitRatePct), 'mid')}
       ${stat(`Median ${card.headlineHorizonHours}h`, pct(card.medianReturnPct), tone(card.medianReturnPct))}
       ${stat('Median peak', pct(card.medianMaxGainPct), 'good')}
       ${stat('Median trough', pct(card.medianMaxDrawdownPct), 'bad')}
