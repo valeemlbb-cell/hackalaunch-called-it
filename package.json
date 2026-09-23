@@ -1,0 +1,32 @@
+{
+  "name": "called-it",
+  "version": "1.0.0",
+  "description": "KOL report cards: score every contract a Crypto Twitter account called against what the price actually did, and check their linked wallets on-chain. Built on the Frontrun Data API.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "bin": {
+    "called-it": "src/cli.js"
+  },
+  "scripts": {
+    "doctor": "node src/cli.js doctor",
+    "report": "node src/cli.js report",
+    "backtest": "node src/cli.js backtest",
+    "serve": "node src/cli.js serve",
+    "mcp": "node src/mcp/server.js",
+    "test": "node --test \"test/*.test.js\"",
+    "test:live": "node --test \"test/live/*.test.js\""
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "solana",
+    "frontrun",
+    "kol",
+    "backtest",
+    "crypto-twitter",
+    "paper-trading"
+  ]
+}

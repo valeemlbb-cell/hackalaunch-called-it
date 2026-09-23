@@ -1,0 +1,122 @@
+{
+  "$comment": [
+    "Endpoint map for the Frontrun Data API.",
+    "The API reference is Gold/hackathon gated, so every path, query parameter and",
+    "response field name lives in THIS FILE instead of being hard-coded in the client.",
+    "When you get the hackathon docs, correct the `path` / `query` values here and the",
+    "whole tool follows - no code changes. Run `npm run doctor` to verify each endpoint",
+    "against the live API and see exactly which ones answered.",
+    "`select` lists candidate JSON paths to the array/object in the response; the first",
+    "one that exists wins, and if none match the client auto-detects the largest array.",
+    "`fieldMap` lists candidate source keys per normalised field, first match wins."
+  ],
+  "version": 1,
+  "defaults": {
+    "timeoutMs": 20000,
+    "retries": 2,
+    "retryBackoffMs": 800
+  },
+  "endpoints": {
+    "trendingAccounts": {
+      "kind": "social",
+      "description": "Twitter profiles gaining the most smart-follower attention right now.",
+      "method": "GET",
+      "path": "/api/v1/twitter/trending-accounts",
+      "query": { "limit": "{{limit}}" },
+      "select": ["data.items", "data.list", "data", "items", "result"],
+      "fieldMap": {
+        "handle": ["handle", "username", "screen_name", "screenName", "twitter_handle", "name"],
+        "smartFollowers": ["smart_followers", "smartFollowers", "smart_follower_count", "count"],
+        "followerDelta": ["delta", "change", "smart_follower_delta", "growth"],
+        "profileUrl": ["profile_url", "url", "link"]
+      }
+    },
+    "smartFollowers": {
+      "kind": "social",
+      "description": "Top smart followers of a handle.",
+      "method": "GET",
+      "path": "/api/v1/twitter/smart-followers",
+      "query": { "handle": "{{handle}}", "limit": "{{limit}}" },
+      "select": ["data.items", "data.list", "data", "items", "result"],
+      "fieldMap": {
+        "handle": ["handle", "username", "screen_name", "screenName", "name"],
+        "followers": ["followers", "follower_count", "followersCount"],
+        "tags": ["tags", "labels", "categories"]
+      }
+    },
+    "caHistory": {
+      "kind": "social",
+      "description": "Contract addresses a tracked account has mentioned, with timestamps.",
+      "method": "GET",
+      "path": "/api/v1/twitter/ca-history",
+      "query": { "handle": "{{handle}}", "limit": "{{limit}}" },
+      "select": ["data.items", "data.list", "data.history", "data", "items", "result"],
+      "fieldMap": {
+        "contract": ["ca", "contract", "contract_address", "contractAddress", "address", "token_address", "mint"],
+        "chain": ["chain", "network", "chain_id", "chainId", "platform"],
+        "symbol": ["symbol", "ticker", "token_symbol"],
+        "calledAt": ["tweeted_at", "tweetedAt", "created_at", "createdAt", "timestamp", "time", "date", "mentioned_at"],
+        "tweetUrl": ["tweet_url", "tweetUrl", "url", "link", "status_url"],
+        "tweetId": ["tweet_id", "tweetId", "id", "status_id"],
+        "deleted": ["deleted", "is_deleted", "isDeleted"]
+      }
+    },
+    "linkedWallets": {
+      "kind": "wallet",
+      "description": "Wallets publicly connected to a Twitter account.",
+      "method": "GET",
+      "path": "/api/v1/twitter/linked-wallets",
+      "query": { "handle": "{{handle}}" },
+      "select": ["data.items", "data.list", "data.wallets", "data", "items", "result"],
+      "fieldMap": {
+        "address": ["address", "wallet", "wallet_address", "walletAddress", "pubkey", "account"],
+        "chain": ["chain", "network", "chain_id", "chainId", "platform"],
+        "source": ["source", "evidence", "reason", "via"],
+        "confidence": ["confidence", "score"]
+      }
+    },
+    "mentionedWallets": {
+      "kind": "wallet",
+      "description": "Wallet addresses referenced in an account's tweets.",
+      "method": "GET",
+      "path": "/api/v1/twitter/mentioned-wallets",
+      "query": { "handle": "{{handle}}", "limit": "{{limit}}" },
+      "select": ["data.items", "data.list", "data.wallets", "data", "items", "result"],
+      "fieldMap": {
+        "address": ["address", "wallet", "wallet_address", "walletAddress", "pubkey"],
+        "chain": ["chain", "network", "chain_id", "chainId"],
+        "mentionedAt": ["mentioned_at", "tweeted_at", "created_at", "timestamp", "time"],
+        "tweetUrl": ["tweet_url", "url", "link"]
+      }
+    },
+    "walletLabels": {
+      "kind": "wallet",
+      "description": "Classification labels for a wallet address.",
+      "method": "GET",
+      "path": "/api/v1/wallet/labels",
+      "query": { "address": "{{address}}", "chain": "{{chain}}" },
+      "select": ["data.labels", "data.items", "data", "labels", "result"],
+      "fieldMap": {
+        "label": ["label", "name", "tag", "title"],
+        "category": ["category", "type", "kind", "group"],
+        "source": ["source", "origin", "provider"]
+      }
+    },
+    "pnlLeaderboard": {
+      "kind": "wallet",
+      "description": "Top wallets by realised PnL on Solana / BNB.",
+      "method": "GET",
+      "path": "/api/v1/wallet/high-pnl",
+      "query": { "chain": "{{chain}}", "limit": "{{limit}}", "period": "{{period}}" },
+      "select": ["data.items", "data.list", "data", "items", "result"],
+      "fieldMap": {
+        "address": ["address", "wallet", "wallet_address", "walletAddress", "pubkey"],
+        "chain": ["chain", "network", "chain_id"],
+        "realizedPnlUsd": ["realized_pnl", "realizedPnl", "pnl", "profit", "realized_profit_usd", "pnl_usd"],
+        "winRate": ["win_rate", "winRate", "winrate"],
+        "trades": ["trades", "trade_count", "tx_count"],
+        "labels": ["labels", "tags"]
+      }
+    }
+  }
+}
