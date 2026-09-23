@@ -1,3 +1,56 @@
+<!-- generated-header v2 -->
+# SUBMISSION — called-it
+
+Paste-ready. Five fields, in the order the HackaLaunch form asks for them.
+Refreshed 2026-09-24T05:06:10+07:00.
+
+---
+
+## TITLE  (73/80 chars)
+
+```
+Called It — grade a crypto Twitter account on what the price actually did
+```
+
+## DESCRIPTION  (1409 chars)
+
+```
+Called It grades a CT account on its record instead of its follower count.
+
+What it does: give it a handle. It pulls every contract address that handle has posted, prices each call against real historical candles, and prints a report card — grade, hit rate, median 24h return, median peak and trough, per-call detail — plus a paper backtest showing what copying those calls would have cost after fees and slippage. Then it asks the question the timeline never answers: do the wallets linked to that account actually hold what they told you to buy?
+
+How it works: three layers, all read-only. Social signal comes from the Frontrun Data API (caHistory, linkedWallets, walletLabels, trendingAccounts, smartFollowers, mentionedWallets, pnlLeaderboard — all seven endpoints; `npm run doctor` prints which answered on your key). Price truth comes from GeckoTerminal public OHLCV. On-chain truth comes from Solana JSON-RPC, read-only, checking current holdings of the linked wallets. Calls that cannot be priced honestly are reported as unscored rather than guessed, and the report carries a confidence flag.
+
+Real vs mocked: the API calls, the candles and the chain reads are real; fixtures exist only so the test suite runs offline. The backtest is paper — no order is ever placed and no key is ever needed.
+
+How to run: `npm install && npm test`, then `npm run doctor` and `npm start -- @handle`. Steps in RUN.md.
+```
+
+## REPO URL
+
+```
+https://github.com/valeemlbb-cell/hackalaunch-called-it
+```
+
+## VIDEO URL
+
+```
+VIDEO_URL_PENDING
+```
+
+> The main session posts `demo_x.mp4` from this folder to X and replaces the
+> line above with the public post URL. The form needs a **link**; a file is useless.
+
+## SOLANA PAYOUT ADDRESS
+
+```
+7W31iaCmjerN1jkpEnmZevn74SZxv83yEQvLsnc4PS7Q
+```
+
+---
+
+## Appendix — earlier submission notes (kept verbatim)
+
 # Submission text
 
 Paste the block below into the "description" field at https://hackalaunch.com/h/called-it/submit
