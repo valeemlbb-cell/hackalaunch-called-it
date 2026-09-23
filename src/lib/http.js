@@ -95,7 +95,10 @@ export async function getJson(url, options = {}) {
         });
         if (RETRYABLE_STATUS.has(response.status) && attempt < retries) {
           lastError = error;
-          await sleep(backoffMs * 2 ** attempt);
+          // A throttled server tells us how long to wait; guessing shorter just
+          // burns the next attempt and gets us throttled harder.
+          const advised = retryAfterMs(response.headers?.get?.('retry-after'));
+          await sleep(Math.max(advised ?? 0, backoffMs * 2 ** attempt));
           continue;
         }
         throw error;
@@ -110,6 +113,32 @@ export async function getJson(url, options = {}) {
     }
   }
   throw lastError ?? new Error(`request failed: ${redact(url)}`);
+}
+
+/** Longest we will sit on a Retry-After before giving up on the attempt. */
+export const MAX_RETRY_AFTER_MS = 30_000;
+
+/**
+ * Parse a Retry-After header, which is either delay-seconds or an HTTP date.
+ * @param {string|null|undefined} value
+ * @returns {number|null} milliseconds to wait, or null when unusable
+ */
+export function retryAfterMs(value, nowMs = Date.now()) {
+  if (typeof value !== 'string' || value.trim() === '') return null;
+  const trimmed = value.trim();
+
+  if (/^\d+$/.test(trimmed)) {
+    return clampWait(Number(trimmed) * 1000);
+  }
+
+  const parsed = Date.parse(trimmed);
+  if (!Number.isFinite(parsed)) return null;
+  return clampWait(parsed - nowMs);
+}
+
+function clampWait(ms) {
+  if (!Number.isFinite(ms) || ms <= 0) return null;
+  return Math.min(ms, MAX_RETRY_AFTER_MS);
 }
 
 function parseJson(text) {

@@ -106,9 +106,14 @@ export function renderReportCard(card) {
   }
 
   lines.push(rule('receipts'));
-  lines.push(`  Frontrun API calls this run: ${card.sources.frontrunCalls.length}`);
-  for (const call of card.sources.frontrunCalls) {
-    lines.push(`    ${String(call.status).padEnd(4)} ${call.count.toString().padStart(4)} items  ${call.endpoint}`);
+  lines.push(`  call source: ${card.sources.callSource ?? 'unknown'}`);
+  // Only the Frontrun path has an API call log; a local call list has none.
+  const frontrunCalls = card.sources.frontrunCalls ?? [];
+  if (frontrunCalls.length > 0) {
+    lines.push(`  Frontrun API calls this run: ${frontrunCalls.length}`);
+    for (const call of frontrunCalls) {
+      lines.push(`    ${String(call.status).padEnd(4)} ${call.count.toString().padStart(4)} items  ${call.endpoint}`);
+    }
   }
   lines.push(`  price data: ${card.sources.priceData}`);
   lines.push(`  on-chain:   ${card.sources.onchain}`);

@@ -1,0 +1,12 @@
+[
+  { "symbol": "BONK",    "contract": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", "calledAt": "2026-08-15T14:00:00Z" },
+  { "symbol": "WIF",     "contract": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", "calledAt": "2026-08-22T09:00:00Z" },
+  { "symbol": "JUP",     "contract": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",  "calledAt": "2026-08-29T18:00:00Z" },
+  { "symbol": "POPCAT",  "contract": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr", "calledAt": "2026-09-02T12:00:00Z" },
+  { "symbol": "PYTH",    "contract": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3", "calledAt": "2026-09-06T16:00:00Z" },
+  { "symbol": "JTO",     "contract": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",  "calledAt": "2026-09-10T11:00:00Z" },
+  { "symbol": "RAY",     "contract": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R", "calledAt": "2026-09-14T08:00:00Z" },
+  { "symbol": "W",       "contract": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ", "calledAt": "2026-09-17T15:00:00Z" },
+  { "symbol": "PENGU",   "contract": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv", "calledAt": "2026-09-19T10:00:00Z" },
+  { "symbol": "TRUMP",   "contract": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN", "calledAt": "2026-09-20T13:00:00Z" }
+]

@@ -1,21 +1,25 @@
 /**
- * The pipeline that turns a Twitter handle into a report card.
+ * The two pipelines that produce a report card.
  *
- *   Frontrun caHistory (social)  ->  every contract this handle called
- *   Frontrun linkedWallets (wallet) + walletLabels
- *          -> who they are on-chain
- *   GeckoTerminal OHLCV          -> what the price actually did after the call
- *   Solana RPC (read-only)       -> do those wallets still hold the token
+ *   buildKolReport   - handle in. Calls come from Frontrun.
+ *   buildListReport  - file in.   Calls come from a list you already have.
+ *
+ * Both then run the identical scoring loop (src/score/scoreCalls.js):
+ *
+ *   GeckoTerminal OHLCV  ->  what the price actually did after the call
+ *   Solana RPC           ->  do the caller's wallets still hold the token
  *
  * Nothing here invents data. If Frontrun does not answer, the run fails loudly.
  */
 
-import { GeckoTerminalClient, isBeyondHistoryWindow } from './onchain/geckoterminal.js';
+import { GeckoTerminalClient } from './onchain/geckoterminal.js';
 import { SolanaReader } from './onchain/solana.js';
-import { scoreCall, DEFAULT_HORIZONS_HOURS, DEFAULT_ENTRY_DELAY_MINUTES } from './score/callScore.js';
+import { DEFAULT_HORIZONS_HOURS, DEFAULT_ENTRY_DELAY_MINUTES } from './score/callScore.js';
+import { scoreCalls } from './score/scoreCalls.js';
 import { buildReportCard } from './score/reportCard.js';
 
-const SECONDS_PER_HOUR = 3600;
+/** Linked wallets we are willing to spend RPC calls on, per report. */
+const MAX_LINKED_WALLETS = 5;
 
 /**
  * @param {import('./frontrun/client.js').FrontrunClient} frontrun
@@ -49,7 +53,9 @@ export async function buildKolReport(frontrun, handle, options = {}) {
     return { items: [] };
   });
 
-  const solanaWallets = linked.items.filter((wallet) => wallet.chain === 'solana').slice(0, 5);
+  const solanaWallets = linked.items
+    .filter((wallet) => wallet.chain === 'solana')
+    .slice(0, MAX_LINKED_WALLETS);
 
   const labelled = [];
   for (const wallet of solanaWallets) {
@@ -62,55 +68,26 @@ export async function buildKolReport(frontrun, handle, options = {}) {
     }
   }
 
-  const horizonMax = Math.max(...horizonsHours);
-  const calls = history.items.slice(0, maxCalls);
-  const scoredCalls = [];
+  const scoredCalls = await scoreCalls({
+    calls: history.items.slice(0, maxCalls),
+    gecko,
+    solana: checkWallets ? solana : null,
+    wallets: solanaWallets,
+    horizonsHours,
+    entryDelayMinutes,
+    log,
+  });
 
-  for (const call of calls) {
-    if (call.chain !== 'solana' && call.chain !== 'bsc') {
-      scoredCalls.push({ call, score: { scored: false, reason: 'unsupported-chain' }, walletCheck: null });
-      continue;
-    }
-    if (isBeyondHistoryWindow(call.calledAt)) {
-      scoredCalls.push({ call, score: { scored: false, reason: 'older-than-180d-price-window' }, walletCheck: null });
-      continue;
-    }
-
-    const pool = await gecko.topPool(call.chain, call.contract);
-    if (!pool) {
-      scoredCalls.push({ call, score: { scored: false, reason: 'no-pool-found' }, walletCheck: null });
-      continue;
-    }
-
-    const ageHours = (Date.now() / 1000 - call.calledAt) / SECONDS_PER_HOUR;
-    const needHours = ageHours + horizonMax + 2;
-    const candles = await gecko.candles(call.chain, pool.poolAddress, {
-      timeframe: 'hour',
-      aggregate: 1,
-      limit: Math.min(Math.ceil(needHours) + 5, 1000),
-    });
-
-    const score = scoreCall(call, candles, { horizonsHours, entryDelayMinutes });
-
-    let walletCheck = null;
-    if (checkWallets && solana && call.chain === 'solana' && solanaWallets.length > 0) {
-      walletCheck = await checkHoldings(solana, solanaWallets, call.contract);
-    }
-
-    scoredCalls.push({ call, score, walletCheck, pool: { address: pool.poolAddress, name: pool.name } });
-    log(
-      `scored ${call.symbol ?? call.contract.slice(0, 6)} @ ${new Date(call.calledAt * 1000).toISOString()} -> ${
-        score.scored ? `${fmt(score.horizons?.[`h${horizonMax}`]?.returnPct)}% @${horizonMax}h` : score.reason
-      }`,
-    );
-  }
-
-  const card = buildReportCard(scoredCalls, { handle, headlineHorizonHours: horizonMax });
+  const card = buildReportCard(scoredCalls, {
+    handle,
+    headlineHorizonHours: Math.max(...horizonsHours),
+  });
 
   return {
     ...card,
     linkedWallets: labelled,
     sources: {
+      callSource: 'Frontrun Data API caHistory',
       frontrunCalls: frontrun.callLog,
       priceData: 'GeckoTerminal public API (OHLCV, hourly, USD)',
       onchain: solana ? 'Solana JSON-RPC (read-only: getTokenAccountsByOwner)' : 'disabled',
@@ -119,25 +96,58 @@ export async function buildKolReport(frontrun, handle, options = {}) {
 }
 
 /**
- * @param {SolanaReader} solana
- * @param {Array<{address:string}>} wallets
- * @param {string} mint
+ * Score a list of calls you already have, with no Frontrun key.
+ *
+ * This is not a mock: the list only supplies (contract, calledAt) pairs, which
+ * is exactly what caHistory supplies. Every price, return, peak and trough below
+ * still comes from real GeckoTerminal candles.
+ *
+ * @param {import('./lib/callList.js').ListedCall[]} calls
+ * @param {{
+ *   label?:string, horizonsHours?:number[], entryDelayMinutes?:number,
+ *   wallets?:string[], solanaRpcUrl?:string, geckoTerminalBaseUrl?:string,
+ *   log?:(message:string)=>void
+ * }} [options]
  */
-async function checkHoldings(solana, wallets, mint) {
-  const results = [];
-  for (const wallet of wallets) {
-    try {
-      const balance = await solana.tokenBalance(wallet.address, mint);
-      results.push({ address: wallet.address, uiAmount: balance.uiAmount, accounts: balance.accounts });
-    } catch (error) {
-      results.push({ address: wallet.address, uiAmount: null, error: error.message });
-    }
-  }
-  const known = results.filter((row) => typeof row.uiAmount === 'number');
-  const holdsNow = known.length === 0 ? null : known.some((row) => row.uiAmount > 0);
-  return { holdsNow, wallets: results };
-}
+export async function buildListReport(calls, options = {}) {
+  const {
+    label,
+    horizonsHours = DEFAULT_HORIZONS_HOURS,
+    entryDelayMinutes = DEFAULT_ENTRY_DELAY_MINUTES,
+    wallets = [],
+    solanaRpcUrl,
+    geckoTerminalBaseUrl,
+    log = () => {},
+  } = options;
 
-function fmt(value) {
-  return typeof value === 'number' ? value.toFixed(1) : '?';
+  const gecko = new GeckoTerminalClient({ baseUrl: geckoTerminalBaseUrl });
+  const solana = wallets.length > 0 && solanaRpcUrl ? new SolanaReader({ rpcUrl: solanaRpcUrl }) : null;
+  const walletObjects = wallets.slice(0, MAX_LINKED_WALLETS).map((address) => ({ address }));
+
+  const scoredCalls = await scoreCalls({
+    calls,
+    gecko,
+    solana,
+    wallets: walletObjects,
+    horizonsHours,
+    entryDelayMinutes,
+    log,
+  });
+
+  const handle = label ?? calls.find((call) => call.handle)?.handle ?? 'call-list';
+
+  const card = buildReportCard(scoredCalls, {
+    handle,
+    headlineHorizonHours: Math.max(...horizonsHours),
+  });
+
+  return {
+    ...card,
+    linkedWallets: walletObjects.map((wallet) => ({ ...wallet, chain: 'solana', labels: [] })),
+    sources: {
+      callSource: 'local call list (no Frontrun key used)',
+      priceData: 'GeckoTerminal public API (OHLCV, hourly, USD)',
+      onchain: solana ? 'Solana JSON-RPC (read-only: getTokenAccountsByOwner)' : 'disabled',
+    },
+  };
 }

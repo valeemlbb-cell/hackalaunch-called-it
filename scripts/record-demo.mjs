@@ -45,6 +45,9 @@ function parseFlags(argv) {
 
 const args = parseFlags(process.argv.slice(2));
 const handle = typeof args.handle === 'string' ? args.handle : null;
+/** Call-list file to demo the scoring engine without a Frontrun key. */
+const listFile = typeof args.list === 'string' ? args.list : null;
+const listLabel = typeof args.label === 'string' ? args.label : 'sample-list';
 
 /** Run a command, capture stdout+stderr, never throw. */
 function capture(command, commandArgs) {
@@ -228,10 +231,48 @@ function main() {
     }
   }
 
+  if (listFile) {
+    // The engine half of the product, shown end to end with no Frontrun key:
+    // the list supplies the calls, GeckoTerminal supplies every price.
+    const listRun = capture('node', [
+      'src/cli.js',
+      'score-list',
+      listFile,
+      '--label',
+      listLabel,
+      '--backtest',
+    ]);
+    scenes.push({
+      title: 'SCORING A CALL LIST - REAL PRICES, NO KEY',
+      body: frame(listRun, { head: 26 }),
+      say:
+        'You do not need a Frontrun key to see the engine work. Point it at a list of calls you already have. ' +
+        'Every price here is a real hourly candle pulled live from GeckoTerminal while this video was recording.',
+    });
+    scenes.push({
+      title: 'THE PART THE TIMELINE NEVER SHOWS YOU',
+      body: frame(listRun),
+      say:
+        'And here is why this matters. Sixty percent of these calls were up at twenty four hours. ' +
+        'The same calls, copied with a five minute delay, thirty basis points of fees and one hundred of slippage each side, ' +
+        'lose money. A good hit rate and a losing strategy are not the same thing, and only one of them fits in a tweet.',
+    });
+
+    const listShot = shoot(listLabel);
+    if (listShot) {
+      scenes.push({
+        title: 'SHAREABLE REPORT',
+        image: listShot,
+        say: 'The same run renders a self contained HTML report card you can send to anyone.',
+      });
+    }
+  }
+
   scenes.push({
     title: 'CALLED IT',
     body: [
       '',
+      '   node src/cli.js score-list <file> score calls you have, no key needed',
       '   npm run doctor                 check your Frontrun key and endpoints',
       '   node src/cli.js report <handle>   build a report card',
       '   node src/cli.js backtest <handle> add the paper backtest',

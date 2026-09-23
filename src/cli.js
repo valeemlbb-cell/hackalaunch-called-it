@@ -10,11 +10,12 @@
  *   called-it serve [--port 8788]          serve the reports in out/
  */
 
-import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadDotEnv, loadConfig, ConfigError, maskKey, PROJECT_ROOT } from './lib/env.js';
 import { FrontrunClient, loadEndpointConfig } from './frontrun/client.js';
-import { buildKolReport } from './pipeline.js';
+import { buildKolReport, buildListReport } from './pipeline.js';
+import { parseCallList } from './lib/callList.js';
 import { runPaperBacktest, DEFAULT_BACKTEST } from './score/paperBacktest.js';
 import { renderReportCard, renderBacktest, rule } from './report/text.js';
 import { renderHtml } from './report/html.js';
@@ -59,6 +60,59 @@ function makeClient(config) {
   return new FrontrunClient(config.frontrun, { config: loadEndpointConfig() });
 }
 
+/** Headline horizon plus the two fixed short ones, deduped and ascending. */
+function horizons(headlineHours) {
+  return [1, 6, headlineHours]
+    .filter((value, index, all) => all.indexOf(value) === index)
+    .sort((a, b) => a - b);
+}
+
+/** `--wallet A --wallet B` or `--wallet A,B`. */
+function parseWallets(flag) {
+  const raw = Array.isArray(flag) ? flag : [flag];
+  return raw
+    .filter((value) => typeof value === 'string')
+    .flatMap((value) => value.split(','))
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function backtestFor(card, flags) {
+  return runPaperBacktest(card.calls, {
+    bankrollUsd: num(flags.bankroll, DEFAULT_BACKTEST.bankrollUsd),
+    positionUsd: num(flags.position, DEFAULT_BACKTEST.positionUsd),
+    feeBps: num(flags['fee-bps'], DEFAULT_BACKTEST.feeBps),
+    slippageBps: num(flags['slippage-bps'], DEFAULT_BACKTEST.slippageBps),
+    exitHorizonHours: card.headlineHorizonHours,
+  });
+}
+
+/** Print the card, then always write the HTML + JSON artefacts to out/. */
+function emitReport(card, backtest, asJson) {
+  if (asJson) {
+    console.log(JSON.stringify({ card, backtest }, null, 2));
+  } else {
+    console.log('');
+    console.log(renderReportCard(card));
+    if (backtest) console.log(renderBacktest(backtest));
+  }
+
+  const slug = slugify(card.handle);
+  const htmlPath = writeOut(`${slug}.html`, renderHtml(card, backtest));
+  const jsonPath = writeOut(`${slug}.json`, JSON.stringify({ card, backtest }, null, 2));
+  if (!asJson) {
+    console.log(`report written to ${htmlPath}`);
+    console.log(`raw json        ${jsonPath}`);
+    console.log(`view it with    node src/cli.js serve`);
+  }
+}
+
+/** Filenames come from user input, so keep them boring and traversal-free. */
+export function slugify(value) {
+  const cleaned = String(value).toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/^[-.]+|[-.]+$/g, '');
+  return cleaned === '' ? 'report' : cleaned.slice(0, 64);
+}
+
 function writeOut(name, contents) {
   mkdirSync(OUT_DIR, { recursive: true });
   const path = resolve(OUT_DIR, name);
@@ -72,6 +126,7 @@ Called It - score what Crypto Twitter called, against what actually happened.
   npm run doctor                                probe every Frontrun endpoint with your key
   node src/cli.js report <handle> [flags]       build a report card
   node src/cli.js backtest <handle> [flags]     report card + paper backtest
+  node src/cli.js score-list <file> [flags]     score a call list you already have (no key)
   node src/cli.js trending [--limit 25]         Frontrun trending accounts
   node src/cli.js wallet <address>              Frontrun labels for a wallet
   node src/cli.js serve [--port 8788]           serve generated reports
@@ -82,6 +137,9 @@ flags
   --entry-delay M      entry delay, minutes      (default 5)
   --no-wallets         skip the on-chain holdings check
   --json               print machine-readable JSON
+  --label NAME         report title for score-list
+  --wallet ADDR        wallet to holdings-check   (score-list, repeatable via commas)
+  --backtest           add the paper backtest     (score-list)
   --bankroll N         paper bankroll USD        (default ${DEFAULT_BACKTEST.bankrollUsd})
   --position N         paper size per call USD   (default ${DEFAULT_BACKTEST.positionUsd})
   --fee-bps N          per-side fee              (default ${DEFAULT_BACKTEST.feeBps})
@@ -109,6 +167,38 @@ async function main() {
       return;
     }
     await startServer({ port, dir: OUT_DIR });
+    return;
+  }
+
+  if (command === 'score-list') {
+    const file = positional[0];
+    if (!file) throw new ConfigError('usage: node src/cli.js score-list <file.json|.jsonl|.csv>');
+    const path = resolve(process.cwd(), file);
+    if (!existsSync(path)) throw new ConfigError(`call list not found: ${path}`);
+
+    // No API key needed: the list supplies the calls, GeckoTerminal supplies the prices.
+    const config = loadConfig(process.env, { requireApiKey: false });
+    const { calls, rejected } = parseCallList(readFileSync(path, 'utf8'), {
+      defaultHandle: typeof flags.label === 'string' ? flags.label : null,
+    });
+
+    if (!asJson) {
+      console.error(`  · call list: ${calls.length} usable, ${rejected.length} rejected`);
+      for (const entry of rejected) console.error(`  · rejected row ${entry.row}: ${entry.reason}`);
+    }
+
+    const horizon = num(flags.horizon, 24);
+    const card = await buildListReport(calls.slice(0, num(flags['max-calls'], 40)), {
+      label: typeof flags.label === 'string' ? flags.label : undefined,
+      horizonsHours: horizons(horizon),
+      entryDelayMinutes: num(flags['entry-delay'], 5),
+      wallets: parseWallets(flags.wallet),
+      solanaRpcUrl: config.solanaRpcUrl,
+      geckoTerminalBaseUrl: config.geckoTerminalBaseUrl,
+      log: asJson ? () => {} : (message) => console.error(`  · ${message}`),
+    });
+
+    emitReport(card, flags.backtest ? backtestFor(card, flags) : null, asJson);
     return;
   }
 
@@ -182,7 +272,7 @@ async function main() {
       const horizon = num(flags.horizon, 24);
       const card = await buildKolReport(client, handle, {
         maxCalls: num(flags['max-calls'], 40),
-        horizonsHours: [1, 6, horizon].filter((value, index, all) => all.indexOf(value) === index).sort((a, b) => a - b),
+        horizonsHours: horizons(horizon),
         entryDelayMinutes: num(flags['entry-delay'], 5),
         checkWallets: !flags['no-wallets'],
         solanaRpcUrl: config.solanaRpcUrl,
@@ -190,33 +280,7 @@ async function main() {
         log: asJson ? () => {} : (message) => console.error(`  · ${message}`),
       });
 
-      const backtest =
-        command === 'backtest'
-          ? runPaperBacktest(card.calls, {
-              bankrollUsd: num(flags.bankroll, DEFAULT_BACKTEST.bankrollUsd),
-              positionUsd: num(flags.position, DEFAULT_BACKTEST.positionUsd),
-              feeBps: num(flags['fee-bps'], DEFAULT_BACKTEST.feeBps),
-              slippageBps: num(flags['slippage-bps'], DEFAULT_BACKTEST.slippageBps),
-              exitHorizonHours: card.headlineHorizonHours,
-            })
-          : null;
-
-      if (asJson) {
-        console.log(JSON.stringify({ card, backtest }, null, 2));
-      } else {
-        console.log('');
-        console.log(renderReportCard(card));
-        if (backtest) console.log(renderBacktest(backtest));
-      }
-
-      const slug = String(card.handle).toLowerCase();
-      const htmlPath = writeOut(`${slug}.html`, renderHtml(card, backtest));
-      const jsonPath = writeOut(`${slug}.json`, JSON.stringify({ card, backtest }, null, 2));
-      if (!asJson) {
-        console.log(`report written to ${htmlPath}`);
-        console.log(`raw json        ${jsonPath}`);
-        console.log(`view it with    node src/cli.js serve`);
-      }
+      emitReport(card, command === 'backtest' ? backtestFor(card, flags) : null, asJson);
       return;
     }
 

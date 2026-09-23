@@ -11,7 +11,9 @@
 import { RateLimiter, getJson } from '../lib/http.js';
 
 const NETWORK_SLUG = { solana: 'solana', bsc: 'bsc' };
-const PUBLIC_RPM = 25;
+// Public tier is documented at ~30 rpm; we sit well under it because a report
+// fires two requests per call and a 429 costs more time than the throttle does.
+const PUBLIC_RPM = Number(process.env.GECKOTERMINAL_RPM) > 0 ? Number(process.env.GECKOTERMINAL_RPM) : 15;
 const MAX_CANDLES = 1000;
 export const OHLCV_HISTORY_DAYS = 180;
 
@@ -34,8 +36,10 @@ export class GeckoTerminalClient {
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined && value !== null) url.searchParams.set(key, String(value));
     }
+    // The public tier answers a short burst then blocks for a while, so a 429
+    // needs patience rather than a quick retry: 4s, 8s, 16s, 32s.
     return this.limiter.schedule(() =>
-      getJson(url.toString(), { fetchImpl: this.fetchImpl, retries: 2, timeoutMs: 20_000 }),
+      getJson(url.toString(), { fetchImpl: this.fetchImpl, retries: 4, backoffMs: 4000, timeoutMs: 20_000 }),
     );
   }
 
@@ -50,7 +54,11 @@ export class GeckoTerminalClient {
     if (!network) return null;
     const cacheKey = `${network}:${contract}`;
     if (!this.poolCache.has(cacheKey)) {
-      this.poolCache.set(cacheKey, this.#fetchTopPool(network, contract));
+      // Cache the promise so concurrent calls share one request, but drop it on
+      // failure - otherwise one transient 429 poisons this token for the run.
+      const pending = this.#fetchTopPool(network, contract);
+      this.poolCache.set(cacheKey, pending);
+      pending.catch(() => this.poolCache.delete(cacheKey));
     }
     return this.poolCache.get(cacheKey);
   }
@@ -59,8 +67,12 @@ export class GeckoTerminalClient {
     let response;
     try {
       response = await this.get(`/networks/${network}/tokens/${encodeURIComponent(contract)}/pools`, { page: 1 });
-    } catch {
-      return null;
+    } catch (error) {
+      // Only a 404 means "this token genuinely has no pool". Swallowing a 429 or
+      // a timeout here would print "no-pool-found" on a report card and quietly
+      // turn an outage into a verdict about the token, so everything else throws.
+      if (error?.status === 404) return null;
+      throw error;
     }
     const pools = Array.isArray(response.body?.data) ? response.body.data : [];
     if (pools.length === 0) return null;

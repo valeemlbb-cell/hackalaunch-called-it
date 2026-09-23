@@ -257,7 +257,8 @@ a { color: var(--accent); }
   <section class="panel">
     <h2>Receipts</h2>
     <ul>${receipts || '<li class="dim">No API calls logged.</li>'}</ul>
-    <p class="dim small">Price data: ${escapeHtml(card.sources?.priceData ?? '—')}<br>
+    <p class="dim small">Call source: ${escapeHtml(card.sources?.callSource ?? '—')}<br>
+    Price data: ${escapeHtml(card.sources?.priceData ?? '—')}<br>
     On-chain: ${escapeHtml(card.sources?.onchain ?? '—')}</p>
   </section>
 

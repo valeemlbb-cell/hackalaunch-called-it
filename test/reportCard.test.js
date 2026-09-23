@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildReportCard, grade, countBy, MIN_CALLS_FOR_CONFIDENCE } from '../src/score/reportCard.js';
+import { renderReportCard } from '../src/report/text.js';
+import { renderHtml } from '../src/report/html.js';
 
 /**
  * @param {number|null} returnPct
@@ -95,4 +97,23 @@ test('confidence reports low-sample honestly', () => {
 
 test('countBy tallies reasons', () => {
   assert.deepEqual(countBy(['a', 'b', 'a']), { a: 2, b: 1 });
+});
+
+test('renders a card from a local call list, which has no Frontrun call log', () => {
+  // Arrange - the list path sets no sources.frontrunCalls at all.
+  const card = buildReportCard(
+    [{ call: { contract: 'DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263', chain: 'solana', calledAt: 1_750_000_000, symbol: 'BONK' }, score: { scored: false, reason: 'no-pool-found' }, walletCheck: null }],
+    { handle: 'sample-list', headlineHorizonHours: 24 },
+  );
+  card.sources = { callSource: 'local call list (no Frontrun key used)', priceData: 'GeckoTerminal', onchain: 'disabled' };
+  card.linkedWallets = [];
+
+  // Act
+  const text = renderReportCard(card);
+  const html = renderHtml(card, null);
+
+  // Assert
+  assert.match(text, /call source: local call list/);
+  assert.doesNotMatch(text, /Frontrun API calls this run/);
+  assert.match(html, /Call source: local call list/);
 });
