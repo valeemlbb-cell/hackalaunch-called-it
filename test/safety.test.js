@@ -54,6 +54,25 @@ test('no committed file contains a plausible API key value', () => {
   assert.deepEqual(offenders, []);
 });
 
+test('the demo recorder burns in no proprietary or system font', () => {
+  const recorder = readFileSync(resolve(PROJECT_ROOT, 'scripts', 'record-demo.mjs'), 'utf8');
+  assert.doesNotMatch(
+    recorder,
+    /[A-Za-z]:[\\/]Windows[\\/]Fonts|\/Library\/Fonts|\/usr\/share\/fonts/i,
+    'the published video must not embed a font from the machine that rendered it',
+  );
+  for (const font of ['DejaVuSansMono.ttf', 'DejaVuSans-Bold.ttf', 'LICENSE-DejaVu.txt']) {
+    const path = resolve(PROJECT_ROOT, 'assets', 'fonts', font);
+    assert.ok(statSync(path).size > 0, `assets/fonts/${font} must be committed with the repo`);
+  }
+});
+
+test('the committed receipts are never read by the shipped code', () => {
+  const files = sourceFiles(resolve(PROJECT_ROOT, 'src'));
+  const offenders = files.filter((file) => /receipts?[\\/]/i.test(readFileSync(file, 'utf8')));
+  assert.deepEqual(offenders, [], 'examples/receipts is captured output, not a fixture');
+});
+
 test('.env.example ships no values', () => {
   const contents = readFileSync(resolve(PROJECT_ROOT, '.env.example'), 'utf8');
   const filled = contents

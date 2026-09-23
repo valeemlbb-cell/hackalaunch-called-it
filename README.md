@@ -69,7 +69,7 @@ purpose. A tool that holds an API key should have the smallest supply chain you 
 git clone https://github.com/<owner>/called-it.git
 cd called-it
 cp .env.example .env          # then paste your Frontrun key into FRONTRUN_API_KEY
-npm test                      # 76 offline tests, no network
+npm test                      # 106 offline tests, no network
 npm run doctor                # probe every Frontrun endpoint with your key
 ```
 
@@ -188,16 +188,49 @@ This tool is **read-only research**. It:
 - escapes every API-sourced string before it reaches HTML;
 - keeps your key in `.env` (gitignored), sends it only as a header, and masks it in all output.
 
+**On-chain access, stated plainly:** every chain read goes to a public **Solana mainnet JSON-RPC over
+a read-only method allow-list** (`getBalance`, `getTokenAccountsByOwner`, `getAccountInfo`, and
+friends). The tool holds no key of any kind, builds no transaction, signs nothing, and moves no
+funds. There is **no deployed program** and therefore no program ID to audit — the on-chain surface
+is entirely `eth_call`-style reading. Mainnet is used because the hackathon judges truth against live
+Solana; nothing here can write to it. (Team convention elsewhere is devnet-only; this repo is exempt
+because it never sends a transaction.)
+
 > **Risk warning.** Every number this tool produces is a backwards-looking measurement of what already
 > happened. It is not a prediction, and it is **not financial advice**. Past calls do not predict
 > future ones. The backtest is a simulation with assumed fills; real fills are worse.
 
 ---
 
+## Receipts — see the real output without a key
+
+You do not need a Frontrun key to check that this thing works. Two files captured from a live run
+are committed:
+
+| File | What it is |
+|---|---|
+| [`examples/receipts/report-card.sample.html`](examples/receipts/report-card.sample.html) | The shareable report card page, exactly as the tool rendered it |
+| [`examples/receipts/report-card.sample.json`](examples/receipts/report-card.sample.json) | The same run, machine-readable, with the paper backtest |
+
+**Captured from a live run on 2026-09-24** with the keyless path:
+
+```bash
+node src/cli.js score-list examples/sample-calls.json --label sample-list --backtest
+```
+
+Real GeckoTerminal candles, real read-only Solana RPC, the same scoring and grading code a keyed
+run uses — 10 calls in, 9 scored, 5 hits, 55.6% at the 24 h horizon. The only thing a key changes is
+*where the call list comes from* (`caHistory` instead of a file) and whether `linkedWallets` has
+anything in it. See [`examples/receipts/README.md`](examples/receipts/README.md) for the full
+provenance. These files are captured output — **nothing in `src/` or `test/` reads them**, and a
+test asserts that.
+
+---
+
 ## Tests
 
 ```bash
-npm test          # 76 offline tests, deterministic, no network
+npm test          # 106 offline tests, deterministic, no network
 npm run test:live # 6 tests against real GeckoTerminal + Solana RPC
 ```
 
@@ -220,8 +253,11 @@ and exist to test the normaliser against synthetic shapes.
 - **AI agent usage:** this project was built with heavy AI-agent assistance (Claude / Claude Code) —
   design, implementation, tests and the demo-recording script. A human set the scope, reviewed the
   output, ran the commands and recorded the demo. Disclosed because you should know.
-- **Licence:** MIT (see `LICENSE`). No third-party fonts or artwork are bundled — the HTML report
-  uses system font stacks only, and the video is rendered from locally installed system fonts.
+- **Licence:** MIT (see `LICENSE`). The HTML report uses CSS system font stacks only (nothing is
+  embedded). The demo video is rendered with **DejaVu Sans Mono** and **DejaVu Sans Bold**, committed
+  at `assets/fonts/` together with their licence at `assets/fonts/LICENSE-DejaVu.txt` (Bitstream Vera
+  / DejaVu — free to use, embed and redistribute). No proprietary or system font is burned into the
+  published video, and no third-party artwork is bundled.
 - **Third-party data:** Frontrun Data API (hackathon key, not redistributed), GeckoTerminal public
   API, a public Solana JSON-RPC. No branding of any wallet, exchange or dApp is copied.
 

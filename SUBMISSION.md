@@ -30,13 +30,22 @@ the real docs is a one-file edit, not a rewrite.
 Also ships an MCP server (`npm run mcp`) so Claude or any MCP client can ask for a report card in
 plain language — three read-only tools, none of which can trade or reveal the key.
 
-Zero runtime dependencies. 76 offline tests plus 6 live-network tests, including a `safety.test.js`
+Zero runtime dependencies. 106 offline tests plus 6 live-network tests, including a `safety.test.js`
 that encodes this hackathon's disqualification rules as assertions: no seed-phrase or signing surface
 anywhere in `src/`, no key-shaped strings committed, `.env` gitignored, no path traversal in the
 viewer, all API-sourced strings HTML-escaped, risk warning always rendered. There is no mock mode —
 if Frontrun does not answer, the run fails loudly rather than showing you data it did not receive.
 
-Node 20+, MIT, no bundled fonts or artwork. All code written during the hackathon window; built with
+You do not need a key to check it works: `examples/receipts/` holds a report card (HTML + JSON)
+captured from a live run on 2026-09-24 via the keyless `score-list` path - real GeckoTerminal
+candles, real read-only Solana RPC, the same scoring code a keyed run uses. It is captured output,
+not a fixture; a test asserts nothing in `src/` reads it.
+
+All on-chain access is read-only Solana mainnet JSON-RPC behind a method allow-list. The tool holds
+no key of any kind, signs nothing, moves no funds, and deploys no program.
+
+Node 20+, MIT. The only bundled assets are two DejaVu fonts for the demo video, committed at
+`assets/fonts/` with their licence. All code written during the hackathon window; built with
 AI-agent assistance (disclosed in the README).
 
 Repo: https://github.com/valeemlbb-cell/hackalaunch-called-it

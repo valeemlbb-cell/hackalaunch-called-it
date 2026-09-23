@@ -41,7 +41,7 @@ docs, then re-run. **No code change is needed** — every path and field name li
 ## 2. Verify
 
 ```bash
-npm test          # expect: 76 pass, 0 fail
+npm test          # expect: 106 pass, 0 fail
 npm run test:live # expect: 6 pass  (real GeckoTerminal + Solana RPC)
 node src/cli.js report <some_kol_handle> --max-calls 25
 ```
@@ -63,9 +63,16 @@ node scripts/record-demo.mjs --handle <the_handle_you_picked>
 This runs the real commands, narrates with edge-tts, screenshots the HTML report with headless Edge,
 and writes `demo.mp4` in the repo root. It prints the duration and warns if it exceeds 180 s.
 
-A version recorded **without** a key already exists at `demo.mp4` (59.6 s: tests, live-data tests,
-and the endpoint check). **Re-record it with the key and a handle before submitting** — the brief
-requires the demo to show real Frontrun data flowing through the tool.
+A version recorded **without** a key already exists at `demo.mp4` (**95.2 s**: tests, live-data
+tests, and the endpoint check — no Frontrun data in it).
+
+> **Do not submit the current `demo.mp4`.** The brief requires the video to show real Frontrun data
+> flowing through the tool, and judges DQ "non-functional demos". Re-record the moment the key
+> arrives, showing `caHistory` → scored calls → `linkedWallets` on-chain check → paper backtest.
+
+The video now renders with the DejaVu fonts committed at `assets/fonts/` (licence in the same
+folder). No Windows system font is burned in any more — that was a DQ trigger under "unlicensed
+artwork, fonts, or code" and it is fixed in `scripts/record-demo.mjs`.
 
 Then upload `demo.mp4` to YouTube (unlisted is fine) / Loom / X and keep the link.
 
@@ -86,15 +93,19 @@ git log --oneline
 git push origin main
 ```
 
-Confirm on GitHub that **`.env` is not there** and `demo.mp4` is **not** committed.
-(Checked at the time of writing: the pushed tree contains no `.env` and no key-shaped strings.)
-
-If you would rather publish it under the org instead, create a second remote:
+If you prefer a fresh public repo under the team org instead of the personal account, this is the
+exact line (the agent cannot run it — `gh` is unauthenticated here):
 
 ```bash
 gh auth login                 # only if not already logged in
-gh repo create warung-ops/called-it --public --source=. --push
+gh repo create warung-ops/called-it --public --source=. --remote=org --push
 ```
+
+Then use that URL in the submission form and in `SUBMISSION.md` instead of the personal one.
+
+Then open the repo on GitHub and confirm with your own eyes that **`.env` is absent** and `demo.mp4`
+is **not** committed, and that `assets/fonts/` and `examples/receipts/` *are* there.
+(Checked at the time of writing: the pushed tree contains no `.env` and no key-shaped strings.)
 
 Add the demo link to the README line at the bottom, then:
 
@@ -115,8 +126,9 @@ Go to **https://hackalaunch.com/h/called-it/submit** (sign in with X as `@issue0
 
 One submission per X account; you can delete and resubmit while the window is open.
 
-The dashboard has a one-click button for this: **"$154 — submit Called It to HackaLaunch"**, which
-opens the submit page and copies the description to your clipboard.
+The dashboard has a one-click button for this: **"~$193.51 + 1.6964 SOL — submit Called It to
+HackaLaunch"**, which opens the submit page and copies the description to your clipboard. (The pool
+is live and still moving; the rules page is the authority, the button label is only a reminder.)
 
 ---
 

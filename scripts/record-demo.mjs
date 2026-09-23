@@ -12,16 +12,21 @@
  * without it the scenes get a fixed duration and no audio), and Microsoft Edge
  * for the headless screenshot of the HTML report (optional).
  *
+ * Fonts: DejaVu Sans Mono + DejaVu Sans Bold, committed under assets/fonts/ with
+ * their licence (Bitstream Vera / DejaVu - free to embed and redistribute). No
+ * font is ever read from the host machine, so the published video is licence-clean.
+ *
  * Output: demo.mp4 in the repo root (gitignored - upload it, do not commit it).
  */
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, rmSync, existsSync, copyFileSync, statSync, readdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readFileSync, rmSync, existsSync, copyFileSync, statSync, readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
 const WORK = resolve(ROOT, 'demo');
+const FONT_DIR = resolve(ROOT, 'assets', 'fonts');
 const WIDTH = 1920;
 const HEIGHT = 1080;
 const MAX_LINES = 30;
@@ -66,6 +71,7 @@ function frame(text, { head = 0 } = {}) {
   const lines = text
     .replace(/\r/g, '')
     .split('\n')
+    .map((line) => line.replace(/\\/g, '/')) // a backslash reads as an escape in drawtext
     .map((line) => line.replace(/[^\x20-\x7E]/g, (char) => (char === '·' ? '-' : ''))) // drawtext is ascii-safe
     .map((line) => (line.length > MAX_COLS ? `${line.slice(0, MAX_COLS - 1)}>` : line));
   const body = head > 0 ? lines.slice(0, head) : lines.filter((line, index) => index >= lines.length - MAX_LINES);
@@ -127,6 +133,27 @@ function imageSize(file) {
   return Number.isFinite(width) && Number.isFinite(height) ? { width, height } : { width: 1280, height: 1280 };
 }
 
+/**
+ * Pull the headline numbers out of the JSON the run just wrote.
+ * @returns {{hitRate:string, spoken:string}|null}
+ */
+function readOutcome(reportName) {
+  const jsonPath = resolve(ROOT, 'out', `${reportName.toLowerCase()}.json`);
+  if (!existsSync(jsonPath)) return null;
+  try {
+    const { card, backtest } = JSON.parse(readFileSync(jsonPath, 'utf8'));
+    if (typeof card?.hitRatePct !== 'number' || typeof backtest?.returnPct !== 'number') return null;
+    const pnl = backtest.returnPct;
+    const spoken =
+      pnl < 0
+        ? `minus ${Math.abs(pnl).toFixed(1)} percent`
+        : `just ${pnl.toFixed(1)} percent`;
+    return { hitRate: card.hitRatePct.toFixed(0), spoken };
+  } catch {
+    return null;
+  }
+}
+
 function duration(file) {
   const result = spawnSync(
     'ffprobe',
@@ -157,8 +184,11 @@ function main() {
   }
   rmSync(WORK, { recursive: true, force: true });
   mkdirSync(WORK, { recursive: true });
-  copyFileSync('C:/Windows/Fonts/consola.ttf', join(WORK, 'mono.ttf'));
-  copyFileSync('C:/Windows/Fonts/seguisb.ttf', join(WORK, 'title.ttf'));
+  // Fonts are the two DejaVu faces committed under assets/fonts/ with their licence
+  // (assets/fonts/LICENSE-DejaVu.txt - Bitstream Vera / free to redistribute and embed).
+  // No system font is ever burned into the published video.
+  copyFileSync(join(FONT_DIR, 'DejaVuSansMono.ttf'), join(WORK, 'mono.ttf'));
+  copyFileSync(join(FONT_DIR, 'DejaVuSans-Bold.ttf'), join(WORK, 'title.ttf'));
 
   const tts = findTts();
   if (!tts) console.warn('no working edge-tts found - rendering a silent video');
@@ -262,13 +292,20 @@ function main() {
         'You do not need a Frontrun key to see the engine work. Point it at a list of calls you already have. ' +
         'Every price here is a real hourly candle pulled live from GeckoTerminal while this video was recording.',
     });
+    // Read the numbers this run actually produced, so the voice-over can never
+    // claim a figure the screen contradicts.
+    const outcome = readOutcome(listLabel);
     scenes.push({
       title: 'THE PART THE TIMELINE NEVER SHOWS YOU',
       body: frame(listRun),
       say:
-        'And here is why this matters. Sixty percent of these calls were up at twenty four hours. ' +
-        'The same calls, copied with a five minute delay, thirty basis points of fees and one hundred of slippage each side, ' +
-        'lose money. A good hit rate and a losing strategy are not the same thing, and only one of them fits in a tweet.',
+        'And here is why this matters. ' +
+        (outcome
+          ? `${outcome.hitRate} percent of these calls were up at twenty four hours, ` +
+            `and copying them still returned ${outcome.spoken}. `
+          : 'Most of these calls were up at twenty four hours, and copying them still lost money. ') +
+        'A five minute delay, thirty basis points of fees and one hundred of slippage on each side eat the edge. ' +
+        'A good hit rate and a profitable strategy are not the same thing, and only one of them fits in a tweet.',
     });
 
     const listShot = shoot(listLabel);
@@ -352,7 +389,12 @@ function main() {
           const file = `${name}_l${String(lineIndex).padStart(2, '0')}.txt`;
           writeFileSync(join(WORK, file), line, 'utf8');
           const y = TEXT_TOP + lineIndex * LINE_HEIGHT;
-          return `drawtext=fontfile=mono.ttf:textfile=${file}:x=70:y=${y}:fontsize=${FONT_SIZE}:fontcolor=0xE6E4EF`;
+          // expansion=none: without it drawtext eats "%" and "\", which silently
+          // deletes every percentage row of a report card.
+          return (
+            `drawtext=fontfile=mono.ttf:textfile=${file}:expansion=none` +
+            `:x=70:y=${y}:fontsize=${FONT_SIZE}:fontcolor=0xE6E4EF`
+          );
         })
         .filter(Boolean);
       input.push('-f', 'lavfi', '-t', String(seconds), '-i', `color=c=0x0E0E13:s=${WIDTH}x${HEIGHT}:r=30`);

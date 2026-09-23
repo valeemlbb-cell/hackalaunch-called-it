@@ -1,0 +1,828 @@
+{
+  "card": {
+    "handle": "sample-list",
+    "generatedAt": "2026-09-23T20:50:29.989Z",
+    "headlineHorizonHours": 24,
+    "totals": {
+      "calls": 10,
+      "scored": 9,
+      "unscored": 1,
+      "decided": 9,
+      "hits": 5
+    },
+    "unscoredReasons": {
+      "price-lookup-failed:429": 1
+    },
+    "hitRatePct": 55.55555555555556,
+    "medianReturnPct": 0.40433245549052266,
+    "meanReturnPct": 2.200440648698203,
+    "medianMaxGainPct": 5.925924571791773,
+    "medianMaxDrawdownPct": -1.7399329341716148,
+    "grade": "B",
+    "confidence": "ok",
+    "bestCall": {
+      "call": {
+        "handle": "sample-list",
+        "contract": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
+        "chain": "solana",
+        "symbol": "W",
+        "calledAt": 1789657200,
+        "tweetUrl": null,
+        "source": "call-list"
+      },
+      "score": {
+        "scored": true,
+        "entryAt": 1789660800,
+        "entryPrice": 0.009726911005633072,
+        "horizons": {
+          "h1": {
+            "hours": 1,
+            "candles": 1,
+            "exitAt": 1789664400,
+            "exitPrice": 0.009656502605200186,
+            "returnPct": -0.7238515947366092,
+            "maxGainPct": 0.10187381184103611,
+            "maxDrawdownPct": -0.7238515947366092
+          },
+          "h6": {
+            "hours": 6,
+            "candles": 6,
+            "exitAt": 1789682400,
+            "exitPrice": 0.009887736503449998,
+            "returnPct": 1.6534077234158797,
+            "maxGainPct": 4.605482854286569,
+            "maxDrawdownPct": -0.7238515947366092
+          },
+          "h24": {
+            "hours": 24,
+            "candles": 24,
+            "exitAt": 1789747200,
+            "exitPrice": 0.010984655676229294,
+            "returnPct": 12.930566239043767,
+            "maxGainPct": 16.709040055375937,
+            "maxDrawdownPct": -0.7238515947366092
+          }
+        },
+        "headlineHorizonHours": 24,
+        "hit": true
+      },
+      "walletCheck": null,
+      "pool": {
+        "address": "4gBdoceUxqqcyzgAqkN3wC5FivB34FwFJvTvgdUf6vLz",
+        "name": "W / USDC"
+      }
+    },
+    "worstCall": {
+      "call": {
+        "handle": "sample-list",
+        "contract": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+        "chain": "solana",
+        "symbol": "PENGU",
+        "calledAt": 1789812000,
+        "tweetUrl": null,
+        "source": "call-list"
+      },
+      "score": {
+        "scored": true,
+        "entryAt": 1789815600,
+        "entryPrice": 0.007952325854045456,
+        "horizons": {
+          "h1": {
+            "hours": 1,
+            "candles": 1,
+            "exitAt": 1789819200,
+            "exitPrice": 0.007979951524113798,
+            "returnPct": 0.34739107244063877,
+            "maxGainPct": 0.891149863070026,
+            "maxDrawdownPct": -0.6083675061058484
+          },
+          "h6": {
+            "hours": 6,
+            "candles": 6,
+            "exitAt": 1789837200,
+            "exitPrice": 0.008076505433940947,
+            "returnPct": 1.5615504466824568,
+            "maxGainPct": 4.901373356782052,
+            "maxDrawdownPct": -1.7722252173380995
+          },
+          "h24": {
+            "hours": 24,
+            "candles": 24,
+            "exitAt": 1789902000,
+            "exitPrice": 0.007712333031421001,
+            "returnPct": -3.0178947270170866,
+            "maxGainPct": 4.901373356782052,
+            "maxDrawdownPct": -4.998679817223623
+          }
+        },
+        "headlineHorizonHours": 24,
+        "hit": false
+      },
+      "walletCheck": null,
+      "pool": {
+        "address": "DdMA1cHcHEqYfttc1z1sJEY978CcU1pyjNuTWTNmdvzU",
+        "name": "PENGU / USDC"
+      }
+    },
+    "talkVsTradeFlags": [],
+    "calls": [
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+          "chain": "solana",
+          "symbol": "TRUMP",
+          "calledAt": 1789909200,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1789912800,
+          "entryPrice": 2.004587383945127,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1789916400,
+              "exitPrice": 2.040287957922956,
+              "returnPct": 1.780943762479846,
+              "maxGainPct": 1.811440263925548,
+              "maxDrawdownPct": 0
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1789934400,
+              "exitPrice": 2.0723434996531456,
+              "returnPct": 3.380052985002382,
+              "maxGainPct": 5.315629734793066,
+              "maxDrawdownPct": 0
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1789999200,
+              "exitPrice": 2.148428122696737,
+              "returnPct": 7.175578371072275,
+              "maxGainPct": 9.615180691759715,
+              "maxDrawdownPct": 0
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": true
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "9d9mb8kooFfaD3SctgZtkxQypkshx6ezhbKio89ixyy2",
+          "name": "TRUMP / USDC"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+          "chain": "solana",
+          "symbol": "PENGU",
+          "calledAt": 1789812000,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1789815600,
+          "entryPrice": 0.007952325854045456,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1789819200,
+              "exitPrice": 0.007979951524113798,
+              "returnPct": 0.34739107244063877,
+              "maxGainPct": 0.891149863070026,
+              "maxDrawdownPct": -0.6083675061058484
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1789837200,
+              "exitPrice": 0.008076505433940947,
+              "returnPct": 1.5615504466824568,
+              "maxGainPct": 4.901373356782052,
+              "maxDrawdownPct": -1.7722252173380995
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1789902000,
+              "exitPrice": 0.007712333031421001,
+              "returnPct": -3.0178947270170866,
+              "maxGainPct": 4.901373356782052,
+              "maxDrawdownPct": -4.998679817223623
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": false
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "DdMA1cHcHEqYfttc1z1sJEY978CcU1pyjNuTWTNmdvzU",
+          "name": "PENGU / USDC"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
+          "chain": "solana",
+          "symbol": "W",
+          "calledAt": 1789657200,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1789660800,
+          "entryPrice": 0.009726911005633072,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1789664400,
+              "exitPrice": 0.009656502605200186,
+              "returnPct": -0.7238515947366092,
+              "maxGainPct": 0.10187381184103611,
+              "maxDrawdownPct": -0.7238515947366092
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1789682400,
+              "exitPrice": 0.009887736503449998,
+              "returnPct": 1.6534077234158797,
+              "maxGainPct": 4.605482854286569,
+              "maxDrawdownPct": -0.7238515947366092
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1789747200,
+              "exitPrice": 0.010984655676229294,
+              "returnPct": 12.930566239043767,
+              "maxGainPct": 16.709040055375937,
+              "maxDrawdownPct": -0.7238515947366092
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": true
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "4gBdoceUxqqcyzgAqkN3wC5FivB34FwFJvTvgdUf6vLz",
+          "name": "W / USDC"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+          "chain": "solana",
+          "symbol": "RAY",
+          "calledAt": 1789372800,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1789376400,
+          "entryPrice": 1.4080590281401295,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1789380000,
+              "exitPrice": 1.4026548360569135,
+              "returnPct": -0.38380437007347823,
+              "maxGainPct": 0.47133534304752356,
+              "maxDrawdownPct": -1.3187794807996582
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1789398000,
+              "exitPrice": 1.3828316430876737,
+              "returnPct": -1.7916425766452446,
+              "maxGainPct": 0.47133534304752356,
+              "maxDrawdownPct": -3.758507460006243
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1789462800,
+              "exitPrice": 1.382130487970792,
+              "returnPct": -1.8414384376758555,
+              "maxGainPct": 2.6175854371171683,
+              "maxDrawdownPct": -5.97005679393147
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": false
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg",
+          "name": "RAY / USDC"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+          "chain": "solana",
+          "symbol": "JTO",
+          "calledAt": 1789038000,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1789041600,
+          "entryPrice": 0.40161142334512157,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1789045200,
+              "exitPrice": 0.4065277999971545,
+              "returnPct": 1.2241625527190443,
+              "maxGainPct": 1.9545481180449027,
+              "maxDrawdownPct": -0.5277484987072649
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1789063200,
+              "exitPrice": 0.41759126099566163,
+              "returnPct": 3.9789300606641156,
+              "maxGainPct": 4.534082110529255,
+              "maxDrawdownPct": -1.7399329341716148
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1789128000,
+              "exitPrice": 0.4275267902461296,
+              "returnPct": 6.4528460582999605,
+              "maxGainPct": 7.013453127201126,
+              "maxDrawdownPct": -1.7399329341716148
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": true
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "G2FiE1yn9N9ZJx5e1E2LxxMnHvb1H3hCuHLPfKJ98smA",
+          "name": "JTO / JitoSOL"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+          "chain": "solana",
+          "symbol": "PYTH",
+          "calledAt": 1788710400,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1788714000,
+          "entryPrice": 0.054423307395897944,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1788717600,
+              "exitPrice": 0.055303493152819676,
+              "returnPct": 1.6172956018988192,
+              "maxGainPct": 1.7668407161297224,
+              "maxDrawdownPct": 0
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1788735600,
+              "exitPrice": 0.056451224510716394,
+              "returnPct": 3.7261923463536157,
+              "maxGainPct": 4.425385623064396,
+              "maxDrawdownPct": -0.3682829275713152
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1788800400,
+              "exitPrice": 0.05494470321156461,
+              "returnPct": 0.9580377243040659,
+              "maxGainPct": 5.925924571791773,
+              "maxDrawdownPct": -0.8650402475596717
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": true
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "9n3dSLrERZQp95dHXywft7xV8D8xnGFLaUHtEhQVaXaC",
+          "name": "PYTH / SOL 0.25%"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr",
+          "chain": "solana",
+          "symbol": "POPCAT",
+          "calledAt": 1788350400,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": false,
+          "reason": "price-lookup-failed:429",
+          "detail": "HTTP 429 for https://api.geckoterminal.com/api/v2/networks/solana/tokens/7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr/pools?page=1"
+        },
+        "walletCheck": null
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+          "chain": "solana",
+          "symbol": "JUP",
+          "calledAt": 1788026400,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1788037200,
+          "entryPrice": 0.2171255741482298,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1788040800,
+              "exitPrice": 0.21807229259862393,
+              "returnPct": 0.4360234643514666,
+              "maxGainPct": 0.4360234643514666,
+              "maxDrawdownPct": 0
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 5,
+              "exitAt": 1788058800,
+              "exitPrice": 0.21494342059773558,
+              "returnPct": -1.0050191273205282,
+              "maxGainPct": 0.9530843029652009,
+              "maxDrawdownPct": -1.0809166220008293
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 21,
+              "exitAt": 1788123600,
+              "exitPrice": 0.2149822100369698,
+              "returnPct": -0.9871541478558179,
+              "maxGainPct": 2.2151409909021633,
+              "maxDrawdownPct": -1.923843000683524
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": false
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "C8Gr6AUuq9hEdSYJzoEpNcdjpojPZwqG5MtQbeouNNwg",
+          "name": "JUP / SOL"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+          "chain": "solana",
+          "symbol": "WIF",
+          "calledAt": 1787389200,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1787392800,
+          "entryPrice": 0.19973958385730856,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1787396400,
+              "exitPrice": 0.20099744216066817,
+              "returnPct": 0.6297491358839588,
+              "maxGainPct": 0.7735087953372906,
+              "maxDrawdownPct": -0.8893402477729552
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1787414400,
+              "exitPrice": 0.20368879740689722,
+              "returnPct": 1.9771812243335443,
+              "maxGainPct": 8.452459204439672,
+              "maxDrawdownPct": -1.6516103928417636
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1787479200,
+              "exitPrice": 0.19520368227278215,
+              "returnPct": -2.270907697378002,
+              "maxGainPct": 8.452459204439672,
+              "maxDrawdownPct": -6.72601452365719
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": false
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "EP2ib6dYdEeqD8MfE2ezHCxX3kP3K2eLKkirfPm5eyMx",
+          "name": "$WIF / SOL"
+        }
+      },
+      {
+        "call": {
+          "handle": "sample-list",
+          "contract": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+          "chain": "solana",
+          "symbol": "BONK",
+          "calledAt": 1786802400,
+          "tweetUrl": null,
+          "source": "call-list"
+        },
+        "score": {
+          "scored": true,
+          "entryAt": 1786806000,
+          "entryPrice": 0.0000023465045031607747,
+          "horizons": {
+            "h1": {
+              "hours": 1,
+              "candles": 1,
+              "exitAt": 1786809600,
+              "exitPrice": 0.0000023392949580355173,
+              "returnPct": -0.30724616618234,
+              "maxGainPct": 0.20903017112739863,
+              "maxDrawdownPct": -0.7750236947242263
+            },
+            "h6": {
+              "hours": 6,
+              "candles": 6,
+              "exitAt": 1786827600,
+              "exitPrice": 0.00000235520136706994,
+              "returnPct": 0.37063060810027476,
+              "maxGainPct": 1.3287331470675225,
+              "maxDrawdownPct": -0.7750236947242263
+            },
+            "h24": {
+              "hours": 24,
+              "candles": 24,
+              "exitAt": 1786892400,
+              "exitPrice": 0.0000023559921824366004,
+              "returnPct": 0.40433245549052266,
+              "maxGainPct": 2.150741932441454,
+              "maxDrawdownPct": -1.7070247009776953
+            }
+          },
+          "headlineHorizonHours": 24,
+          "hit": true
+        },
+        "walletCheck": null,
+        "pool": {
+          "address": "5zpyutJu9ee6jFymDGoK7F6S5Kczqtc9FomP3ueKuyA9",
+          "name": "Bonk / SOL"
+        }
+      }
+    ],
+    "linkedWallets": [],
+    "sources": {
+      "callSource": "local call list (no Frontrun key used)",
+      "priceData": "GeckoTerminal public API (OHLCV, hourly, USD)",
+      "onchain": "disabled"
+    }
+  },
+  "backtest": {
+    "mode": "paper",
+    "settings": {
+      "bankrollUsd": 1000,
+      "positionUsd": 100,
+      "feeBps": 30,
+      "slippageBps": 100,
+      "exitHorizonHours": 24
+    },
+    "startingBankrollUsd": 1000,
+    "endingBankrollUsd": 996.0445095967151,
+    "realisedPnlUsd": -3.9554904032849123,
+    "returnPct": -0.39554904032849125,
+    "tradeCount": 9,
+    "skippedCount": 0,
+    "unpricedCount": 1,
+    "winRatePct": 33.33333333333333,
+    "bestTrade": {
+      "contract": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
+      "symbol": "W",
+      "calledAt": 1789657200,
+      "entryAt": 1789660800,
+      "entryPrice": 0.009726911005633072,
+      "exitPrice": 0.010984655676229294,
+      "grossReturnPct": 12.930566239043767,
+      "netReturnPct": 10.013456782523011,
+      "sizeUsd": 100,
+      "pnlUsd": 10.013456782523011,
+      "tweetUrl": null
+    },
+    "worstTrade": {
+      "contract": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+      "symbol": "PENGU",
+      "calledAt": 1789812000,
+      "entryAt": 1789815600,
+      "entryPrice": 0.007952325854045456,
+      "exitPrice": 0.007712333031421001,
+      "grossReturnPct": -3.0178947270170866,
+      "netReturnPct": -5.523039488323511,
+      "sizeUsd": 100,
+      "pnlUsd": -5.523039488323511,
+      "tweetUrl": null
+    },
+    "maxDrawdownPct": -1.285303370365341,
+    "trades": [
+      {
+        "contract": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+        "symbol": "BONK",
+        "calledAt": 1786802400,
+        "entryAt": 1786806000,
+        "entryPrice": 0.0000023465045031607747,
+        "exitPrice": 0.0000023559921824366004,
+        "grossReturnPct": 0.40433245549052266,
+        "netReturnPct": -2.1892118561672613,
+        "sizeUsd": 100,
+        "pnlUsd": -2.1892118561672613,
+        "tweetUrl": null
+      },
+      {
+        "contract": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+        "symbol": "WIF",
+        "calledAt": 1787389200,
+        "entryAt": 1787392800,
+        "entryPrice": 0.19973958385730856,
+        "exitPrice": 0.19520368227278215,
+        "grossReturnPct": -2.270907697378002,
+        "netReturnPct": -4.795347880647038,
+        "sizeUsd": 100,
+        "pnlUsd": -4.795347880647038,
+        "tweetUrl": null
+      },
+      {
+        "contract": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+        "symbol": "JUP",
+        "calledAt": 1788026400,
+        "entryAt": 1788037200,
+        "entryPrice": 0.2171255741482298,
+        "exitPrice": 0.2149822100369698,
+        "grossReturnPct": -0.9871541478558179,
+        "netReturnPct": -3.544754969062558,
+        "sizeUsd": 100,
+        "pnlUsd": -3.544754969062558,
+        "tweetUrl": null
+      },
+      {
+        "contract": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+        "symbol": "PYTH",
+        "calledAt": 1788710400,
+        "entryAt": 1788714000,
+        "entryPrice": 0.054423307395897944,
+        "exitPrice": 0.05494470321156461,
+        "grossReturnPct": 0.9580377243040659,
+        "netReturnPct": -1.6498093481524312,
+        "sizeUsd": 100,
+        "pnlUsd": -1.6498093481524312,
+        "tweetUrl": null
+      },
+      {
+        "contract": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+        "symbol": "JTO",
+        "calledAt": 1789038000,
+        "entryAt": 1789041600,
+        "entryPrice": 0.40161142334512157,
+        "exitPrice": 0.4275267902461296,
+        "grossReturnPct": 6.4528460582999605,
+        "netReturnPct": 3.703062591768025,
+        "sizeUsd": 100,
+        "pnlUsd": 3.703062591768025,
+        "tweetUrl": null
+      },
+      {
+        "contract": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+        "symbol": "RAY",
+        "calledAt": 1789372800,
+        "entryAt": 1789376400,
+        "entryPrice": 1.4080590281401295,
+        "exitPrice": 1.382130487970792,
+        "grossReturnPct": -1.8414384376758555,
+        "netReturnPct": -4.376972241392252,
+        "sizeUsd": 100,
+        "pnlUsd": -4.376972241392252,
+        "tweetUrl": null
+      },
+      {
+        "contract": "85VBFQZC9TZkfaptBWjvUw7YbZjy52A6mjtPGjstQAmQ",
+        "symbol": "W",
+        "calledAt": 1789657200,
+        "entryAt": 1789660800,
+        "entryPrice": 0.009726911005633072,
+        "exitPrice": 0.010984655676229294,
+        "grossReturnPct": 12.930566239043767,
+        "netReturnPct": 10.013456782523011,
+        "sizeUsd": 100,
+        "pnlUsd": 10.013456782523011,
+        "tweetUrl": null
+      },
+      {
+        "contract": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+        "symbol": "PENGU",
+        "calledAt": 1789812000,
+        "entryAt": 1789815600,
+        "entryPrice": 0.007952325854045456,
+        "exitPrice": 0.007712333031421001,
+        "grossReturnPct": -3.0178947270170866,
+        "netReturnPct": -5.523039488323511,
+        "sizeUsd": 100,
+        "pnlUsd": -5.523039488323511,
+        "tweetUrl": null
+      },
+      {
+        "contract": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+        "symbol": "TRUMP",
+        "calledAt": 1789909200,
+        "entryAt": 1789912800,
+        "entryPrice": 2.004587383945127,
+        "exitPrice": 2.148428122696737,
+        "grossReturnPct": 7.175578371072275,
+        "netReturnPct": 4.407126006169104,
+        "sizeUsd": 100,
+        "pnlUsd": 4.407126006169104,
+        "tweetUrl": null
+      }
+    ],
+    "equityCurve": [
+      {
+        "t": 1786802400,
+        "equity": 1000
+      },
+      {
+        "t": 1786892400,
+        "equity": 997.8107881438327
+      },
+      {
+        "t": 1787479200,
+        "equity": 993.0154402631857
+      },
+      {
+        "t": 1788123600,
+        "equity": 989.4706852941232
+      },
+      {
+        "t": 1788800400,
+        "equity": 987.8208759459708
+      },
+      {
+        "t": 1789128000,
+        "equity": 991.5239385377388
+      },
+      {
+        "t": 1789462800,
+        "equity": 987.1469662963466
+      },
+      {
+        "t": 1789747200,
+        "equity": 997.1604230788696
+      },
+      {
+        "t": 1789902000,
+        "equity": 991.637383590546
+      },
+      {
+        "t": 1789999200,
+        "equity": 996.0445095967151
+      }
+    ]
+  }
+}
