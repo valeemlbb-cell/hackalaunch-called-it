@@ -73,28 +73,28 @@ Then upload `demo.mp4` to YouTube (unlisted is fine) / Loom / X and keep the lin
 
 ## 4. Push the repo
 
-`gh` is not authenticated in the agent's environment. Run this yourself:
+**The repo already exists and is public:**
+<https://github.com/valeemlbb-cell/hackalaunch-called-it>
+(created and pushed from your machine at 02:58 WIB / 19:58 UTC on Sep 23.)
+
+The commits made after that push are still local. Send them up:
 
 ```bash
 cd D:\warung-ops\hacka\called-it
-gh auth login                 # only if not already logged in
-gh repo create warung-ops/called-it --public --source=. --push
-```
-
-If the `warung-ops` org does not exist, use your own account:
-
-```bash
-gh repo create called-it --public --source=. --push
-```
-
-Sanity check before pushing:
-
-```bash
 git status --short            # expect clean; .env, out/, demo/, demo.mp4 are gitignored
 git log --oneline
+git push origin main
 ```
 
 Confirm on GitHub that **`.env` is not there** and `demo.mp4` is **not** committed.
+(Checked at the time of writing: the pushed tree contains no `.env` and no key-shaped strings.)
+
+If you would rather publish it under the org instead, create a second remote:
+
+```bash
+gh auth login                 # only if not already logged in
+gh repo create warung-ops/called-it --public --source=. --push
+```
 
 Add the demo link to the README line at the bottom, then:
 
@@ -102,15 +102,13 @@ Add the demo link to the README line at the bottom, then:
 git commit -am "docs: add demo video link" && git push
 ```
 
----
-
 ## 5. Submit
 
 Go to **https://hackalaunch.com/h/called-it/submit** (sign in with X as `@issue0x`) and fill in:
 
 | Field | Value |
 |---|---|
-| GitHub repo | `https://github.com/warung-ops/called-it` |
+| GitHub repo | `https://github.com/valeemlbb-cell/hackalaunch-called-it` |
 | Video link | the upload from step 3 |
 | Description | paste from `SUBMISSION.md` |
 | Payout address | `7W31iaCmjerN1jkpEnmZevn74SZxv83yEQvLsnc4PS7Q` |

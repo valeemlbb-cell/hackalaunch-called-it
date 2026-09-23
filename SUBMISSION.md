@@ -39,6 +39,8 @@ if Frontrun does not answer, the run fails loudly rather than showing you data i
 Node 20+, MIT, no bundled fonts or artwork. All code written during the hackathon window; built with
 AI-agent assistance (disclosed in the README).
 
+Repo: https://github.com/valeemlbb-cell/hackalaunch-called-it
+
 Run it: `cp .env.example .env` → add key → `npm run doctor` → `node src/cli.js backtest <handle>`.
 
 Not financial advice.
