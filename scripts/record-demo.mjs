@@ -16,7 +16,7 @@
  */
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, writeFileSync, rmSync, existsSync, copyFileSync, statSync } from 'node:fs';
+import { mkdirSync, writeFileSync, rmSync, existsSync, copyFileSync, statSync, readdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -116,6 +116,17 @@ function synth(binary, text, outFile) {
   return result.status === 0 && existsSync(outFile) && statSync(outFile).size > 1000;
 }
 
+/** @returns {{width:number, height:number}} */
+function imageSize(file) {
+  const result = spawnSync(
+    'ffprobe',
+    ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', file],
+    { encoding: 'utf8' },
+  );
+  const [width, height] = String(result.stdout ?? '').trim().split(',').map(Number);
+  return Number.isFinite(width) && Number.isFinite(height) ? { width, height } : { width: 1280, height: 1280 };
+}
+
 function duration(file) {
   const result = spawnSync(
     'ffprobe',
@@ -168,6 +179,8 @@ function main() {
       '   receipts        GeckoTerminal      - real hourly candles, real returns',
       '',
       '   Read-only. No wallet connect. No order-placing code. Paper trading only.',
+      '',
+      '   Works with a Frontrun key, or on any call list you already have.',
     ].join('\n'),
     say:
       'Called It turns a Crypto Twitter handle into a report card. ' +
@@ -180,7 +193,7 @@ function main() {
     title: 'TESTS',
     body: frame(offline),
     say:
-      'The scoring engine is pure and fully tested. Seventy six offline tests cover entry timing, ' +
+      'The scoring engine is pure and fully tested. Over a hundred offline tests cover entry timing, ' +
       'peak and trough measurement, grading, cost modelling, and the safety rules from the hackathon brief.',
   });
 
@@ -309,9 +322,25 @@ function main() {
     if (scene.image) {
       copyFileSync(scene.image, join(WORK, `${name}.png`));
       input.push('-loop', '1', '-t', String(seconds), '-i', `${name}.png`);
+
+      // A report page is far taller than the frame. Scaling it to fit would make
+      // the numbers unreadable, so we show it full width and pan down it instead,
+      // holding a beat at the top and bottom.
+      const viewWidth = WIDTH - 160;
+      const viewHeight = HEIGHT - 180;
+      const scaled = imageSize(scene.image);
+      const scaledHeight = Math.round((scaled.height * viewWidth) / scaled.width);
+      const hold = 1.2;
+      const travel = Math.max(seconds - hold * 2, 0.1);
+      const panY =
+        scaledHeight > viewHeight
+          ? `'(ih-oh)*min(max((t-${hold})/${travel.toFixed(2)}\\,0)\\,1)'`
+          : '0';
+
       filters.push(
-        `[0:v]scale=${WIDTH - 160}:-1:force_original_aspect_ratio=decrease,` +
-          `pad=${WIDTH}:${HEIGHT}:80:140:color=0x0E0E13,crop=${WIDTH}:${HEIGHT}:0:0,${titleDraw}[v]`,
+        `[0:v]scale=${viewWidth}:-2,` +
+          `crop=${viewWidth}:min(${viewHeight}\\,ih):0:${panY},` +
+          `pad=${WIDTH}:${HEIGHT}:80:140:color=0x0E0E13,${titleDraw}[v]`,
       );
     } else {
       // One drawtext per line. ffmpeg 8 renders a tofu box for the newline
@@ -370,25 +399,51 @@ function main() {
 }
 
 /** Headless Edge screenshot of the generated report. Returns a path or null. */
-function shoot(handleName) {
-  if (!existsSync(EDGE)) return null;
-  const reportPath = resolve(ROOT, 'out', `${handleName.toLowerCase()}.html`);
+/**
+ * Browsers that can screenshot a local file, best first.
+ * Edge's --headless=new exits 0 and writes nothing on some builds, so a
+ * Playwright chrome-headless-shell is preferred when one is installed.
+ */
+function screenshotBrowsers() {
+  const found = [];
+  const pwRoot = join(process.env.LOCALAPPDATA ?? '', 'ms-playwright');
+  if (existsSync(pwRoot)) {
+    for (const entry of readdirSync(pwRoot).filter((name) => name.startsWith('chromium')).sort().reverse()) {
+      for (const variant of ['chrome-headless-shell-win64/chrome-headless-shell.exe', 'chrome-win/chrome.exe']) {
+        const candidate = join(pwRoot, entry, variant);
+        if (existsSync(candidate)) found.push(candidate);
+      }
+    }
+  }
+  if (existsSync(EDGE)) found.push(EDGE);
+  return found;
+}
+
+function shoot(reportName) {
+  const reportPath = resolve(ROOT, 'out', `${reportName.toLowerCase()}.html`);
   if (!existsSync(reportPath)) return null;
   const shotPath = join(WORK, 'report.png');
-  const result = spawnSync(
-    EDGE,
-    [
-      '--headless=new',
-      '--disable-gpu',
-      '--hide-scrollbars',
-      '--force-device-scale-factor=1',
-      '--window-size=1280,1600',
-      `--screenshot=${shotPath}`,
-      `file:///${reportPath.replace(/\\/g, '/')}`,
-    ],
-    { encoding: 'utf8', timeout: 60_000 },
-  );
-  return result.status === 0 && existsSync(shotPath) ? shotPath : null;
+
+  for (const browser of screenshotBrowsers()) {
+    rmSync(shotPath, { force: true });
+    spawnSync(
+      browser,
+      [
+        '--disable-gpu',
+        '--hide-scrollbars',
+        '--force-device-scale-factor=1',
+        '--virtual-time-budget=4000',
+        '--window-size=1280,1700',
+        `--screenshot=${shotPath}`,
+        `file:///${reportPath.replace(/\\/g, '/')}`,
+      ],
+      { encoding: 'utf8', timeout: 90_000 },
+    );
+    // Exit status lies on some builds; the file on disk is the real answer.
+    if (existsSync(shotPath) && statSync(shotPath).size > 5000) return shotPath;
+  }
+  console.warn('no browser produced a screenshot - skipping the HTML report scene');
+  return null;
 }
 
 main();

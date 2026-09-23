@@ -208,7 +208,7 @@ a { color: var(--accent); }
 <div class="wrap">
   <header>
     <div>
-      <div class="brand">Called It · Frontrun Data API</div>
+      <div class="brand">Called It · ${escapeHtml(card.sources?.callSource ?? 'Frontrun Data API')}</div>
       <h1>@${escapeHtml(card.handle)}</h1>
       <div class="dim small">${escapeHtml(card.totals.scored)} of ${escapeHtml(card.totals.calls)} calls priced ·
       ${escapeHtml(card.headlineHorizonHours)}h horizon · ${escapeHtml(card.confidence)} confidence ·
